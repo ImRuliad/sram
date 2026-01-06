@@ -43,3 +43,13 @@ async def test_write_high(dut):
     await Timer(1, units=NANOSECONDS)
     assert dut.data_out.value == HIGH, f"Write High failed: data_out should be {HIGH}, got {dut.data_out.value}"
 
+@cocotb.test()
+async def test_write_low(dut):
+    await reset_sequence(dut)
+    dut.write_enable.value = HIGH
+    dut.data_in.value = LOW
+    dut.clk.value = LOW
+    await Timer(1, units=NANOSECONDS)
+    dut.clk.value = HIGH
+    await Timer(1, units=NANOSECONDS)
+    assert dut.data_out.value == LOW, f"Write Low failed: data_out should be {LOW}, got {dut.data_out.value}"
