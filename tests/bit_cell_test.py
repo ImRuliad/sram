@@ -60,3 +60,14 @@ async def test_write_low(dut):
     await generate_clock_cycle(dut)
     assert dut.data_out.value == LOW, f"Write Low failed: EXPECTED {LOW}, GOT {dut.data_out.value}"
 
+# ============================================= ASYNC AND RESET PRIORITY TESTS =============================================
+
+@cocotb.test()
+async def test_async_rst_during_clk_high(dut):
+    await reset_sequence(dut)
+    await write_data(dut, HIGH)
+    dut.clk.value = HIGH
+    await Timer(1, unit=NANOSECONDS)
+    dut.rst.value = HIGH
+    await Timer(1, unit=NANOSECONDS)
+    assert dut.data_out.value == LOW, f"Async Reset during CLK High failed: EXPECTED {LOW}, GOT {dut.data_out.value}"
