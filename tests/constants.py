@@ -10,7 +10,7 @@ ADDR_WIDTH = math.log2(ROWS)
 
 #Test timing constants
 NANOSECONDS = "ns"
-CLOCK_PERIOD_NS = 2
+CLOCK_PERIOD_NS = 1000000
 
 #Logic Levels
 LOW = 0
