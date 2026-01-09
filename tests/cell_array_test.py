@@ -15,7 +15,7 @@ async def reset_cell_array(dut: SimHandleBase) -> None:
     dut.rst.value = constants.HIGH
     dut.row_select.value = constants.LOW
     dut.col_select.value = constants.LOW
-    dut.write_enable.value = constants.LOW
+    dut.write_enable.value = 0x00  # 8-bit byte-enable: all bits disabled
     dut.data_in.value = constants.LOW
     dut.clk.value = constants.LOW
 
@@ -27,16 +27,16 @@ async def reset_cell_array(dut: SimHandleBase) -> None:
 async def write_byte(dut: SimHandleBase, row: int, col: int, data: int) -> None:
     dut.row_select.value = row
     dut.col_select.value = col
-    dut.write_enable.value = 0xFF
+    dut.write_enable.value = 0xFF  # 8-bit byte-enable: all bits enabled
     dut.data_in.value = data
 
     await generate_clock_cycle(dut)
-    dut.write_enable.value = constants.LOW
+    dut.write_enable.value = 0x00  # Disable all byte-enable bits
 
 async def read_byte(dut: SimHandleBase, row: int, col: int) -> int:
     dut.row_select.value = row
     dut.col_select.value = col
-    dut.write_enable.value = constants.LOW
+    dut.write_enable.value = 0x00  # 8-bit byte-enable: all bits disabled (read mode)
 
     await Timer(1, unit=constants.NANOSECONDS)
     return int(dut.data_out.value)
