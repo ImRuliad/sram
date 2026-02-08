@@ -1,8 +1,9 @@
 import cocotb
 import tests.constants as constants
 from cocotb.triggers import Timer
+from cocotb.handle import SimHandleBase
 
-async def reset_sequence(dut):
+async def reset_sequence(dut: SimHandleBase) -> None:
     dut.rst.value = constants.HIGH
     dut.write_enable.value = constants.LOW
     dut.data_in.value = constants.LOW
@@ -11,13 +12,13 @@ async def reset_sequence(dut):
     dut.rst.value = constants.LOW
     await Timer(1, unit=constants.NANOSECONDS)
 
-async def generate_clock_cycle(dut):
+async def generate_clock_cycle(dut: SimHandleBase) -> None:
     dut.clk.value = constants.LOW
     await Timer(1, unit=constants.NANOSECONDS)
     dut.clk.value = constants.HIGH
     await Timer(1, unit=constants.NANOSECONDS)
 
-async def write_data(dut, data):
+async def write_data(dut: SimHandleBase, data: int) -> None:
     dut.write_enable.value = constants.HIGH
     dut.data_in.value = data
 
@@ -25,23 +26,23 @@ async def write_data(dut, data):
 
 #ensure ff can be clocked.
 @cocotb.test()
-async def smoke_test(dut):
+async def smoke_test(dut: SimHandleBase) -> None:
     for _ in range (constants.CLOCK_PERIOD_NS):
       await generate_clock_cycle(dut)
 
 #ensure ff state can be reset.
 @cocotb.test()
-async def test_reset_state(dut):
-    dut.rst.value = constants.HIGH
-    dut.write_enable.value = constants.LOW
-    dut.data_in.value = constants.LOW
+async def test_reset_state(dut: SimHandleBase) -> None:
+    dut.rst.value: int = constants.HIGH
+    dut.write_enable.value: int = constants.LOW
+    dut.data_in.value: int = constants.LOW
     await Timer(2, unit=constants.NANOSECONDS)
     assert dut.data_out.value == constants.LOW, f"Reset failed: EXPECTED {constants.LOW}, GOT {dut.data_out.value}"
     cocotb.log.info("Reset state passed!")
 
 #ensure ff can output active high.
 @cocotb.test()
-async def test_write_high(dut):
+async def test_write_high(dut: SimHandleBase) -> None:
     await reset_sequence(dut)
     await write_data(dut, constants.HIGH)
     await generate_clock_cycle(dut)
@@ -49,7 +50,7 @@ async def test_write_high(dut):
 
 #ensure ff can output active low.
 @cocotb.test()
-async def test_write_low(dut):
+async def test_write_low(dut: SimHandleBase) -> None:
     await reset_sequence(dut)
     await write_data(dut, constants.LOW)
     await generate_clock_cycle(dut)
@@ -58,21 +59,21 @@ async def test_write_low(dut):
 # ============================================= ASYNC AND RESET PRIORITY TESTS =============================================
 
 @cocotb.test()
-async def test_async_rst_during_clk_high(dut):
+async def test_async_rst_during_clk_high(dut: SimHandleBase) -> None:
     await reset_sequence(dut)
     await write_data(dut, constants.HIGH)
-    dut.clk.value = constants.HIGH
+    dut.clk.value: int = constants.HIGH
     await Timer(1, unit=constants.NANOSECONDS)
-    dut.rst.value = constants.HIGH
+    dut.rst.value: int = constants.HIGH
     await Timer(1, unit=constants.NANOSECONDS)
     assert dut.data_out.value == constants.LOW, f"Async Reset during CLK High failed: EXPECTED {constants.LOW}, GOT {dut.data_out.value}"
 
 @cocotb.test()
-async def test_async_rst_during_clk_low(dut):
+async def test_async_rst_during_clk_low(dut: SimHandleBase) -> None:
     await reset_sequence(dut)
     await write_data(dut, constants.HIGH)
-    dut.clk.value = constants.LOW
+    dut.clk.value: int = constants.LOW
     await Timer(1, unit=constants.NANOSECONDS)
-    dut.rst.value = constants.HIGH
+    dut.rst.value: int = constants.HIGH
     await Timer(1, unit=constants.NANOSECONDS)
     assert dut.data_out.value == constants.LOW, f"Async Reset during clk Low failed: EXPECTED {constants.LOW}, GOT {dut.data_out.value}"
