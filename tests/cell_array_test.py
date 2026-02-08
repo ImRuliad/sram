@@ -51,4 +51,4 @@ async def test_read_write(dut):
     await reset_cell_array(dut)
     test_data, test_row, test_col = constants.ALL_ONES, 0, 0
     await write_byte(dut, test_row, test_col, test_data)
-    assert await read_byte(dut, test_row, test_col) == test_data, f"Expected {test_data}, got {await read_byte(dut, test_row, test_col)}"
+    assert await read_byte(dut, test_row, test_col) == test_data, f"EXPECTED {test_data}, got {await read_byte(dut, test_row, test_col)}"
