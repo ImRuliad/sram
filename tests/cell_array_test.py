@@ -3,7 +3,7 @@ from cocotb.handle import SimHandleBase
 from cocotb.triggers import Timer
 
 import tests.constants as constants
-from tests.utils import generate_clock_cycle
+from tests.utils import generate_clock_cycle, smoke_test
 
 # ==================== HELPER FUNCTIONS ====================
 
@@ -41,11 +41,11 @@ async def read_byte(dut: SimHandleBase, row: int, col: int) -> int:
 # ==================== BASIC FUNCTIONAL TESTS ====================
 
 
-# Verify cell array can be clocked
+# Ensure cell can be clocked
+# Figure out how to call this method from utils.py
 @cocotb.test()
 async def smoke_test(dut: SimHandleBase) -> None:
-    for _ in range(constants.CLOCK_PERIOD_NS):
-        await generate_clock_cycle(dut)
+    await smoke_test(dut)
 
 
 @cocotb.test()

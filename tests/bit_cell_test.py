@@ -3,7 +3,7 @@ from cocotb.handle import SimHandleBase
 from cocotb.triggers import Timer
 
 import tests.constants as constants
-from tests.utils import generate_clock_cycle
+from tests.utils import generate_clock_cycle, smoke_test
 
 
 async def reset_sequence(dut: SimHandleBase) -> None:
@@ -22,13 +22,9 @@ async def write_data(dut: SimHandleBase, data: int) -> None:
 
 
 # ============================================= BASIC FUNCTIONALITY TESTS =============================================
-
-
-# ensure ff can be clocked.
 @cocotb.test()
 async def smoke_test(dut: SimHandleBase) -> None:
-    for _ in range(constants.CLOCK_PERIOD_NS):
-        await generate_clock_cycle(dut)
+    await smoke_test(dut)
 
 
 # ensure ff state can be reset.
