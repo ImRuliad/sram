@@ -14,19 +14,19 @@ module memory_banks #(
     output wire [DATA_WIDTH-1:0] data_out
 );
     wire [DATA_WIDTH-1:0] bank_data_out [NUM_BANKS-1:0];
-    wire [NUM_BANKS-1:0] bank_write_enable;
+    wire [NUM_BANKS-1:0] bank_write_en;
 
-    genvar b;
+    genvar curr_bank;
     generate
         for (curr_bank = 0; curr_bank < NUM_BANKS; curr_bank = curr_bank + 1) begin : gen_banks
-            assign bank_write_en[b] = (bank_select == b);
+            assign bank_write_en[curr_bank] = (bank_select == b);
             cell_array #(
                 .ROWS(ROWS),
                 .COLS(COLS),
                 .DATA_WIDTH(DATA_WIDTH)
             ) bank_inst (
                 .clk(clk),
-                .rsk(rst),
+                .rst(rst),
                 .row_select(row_select),
                 .col_select(col_select),
                 .write_enable(bank_write_en[b] ? write_enable : {DATA_WIDTH{1'b0}}),
