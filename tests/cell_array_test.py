@@ -57,3 +57,47 @@ async def test_read_write(dut: SimHandleBase) -> None:
     await write_byte(dut, test_row, test_col, test_data)
     read_data: int = await read_byte(dut, test_row, test_col)
     assert read_data == test_data, f"Expected {test_data}, got {read_data}"
+
+@cocotb.test()
+async def test_march_c(dut: SimHandleBase) -> None:
+    await reset_cell_array(dut)
+
+    all_addresses = [
+        (row,col)
+        for row in range (constants.ROWS)
+        for col in range (constants.COLS // constants.DATA_WIDTH)
+    ]
+
+    #Pass 1
+    for row, col in all_addresses:
+        await write_byte(dut, row, col, constants.ALL_ZEROES)
+    
+    #Pass 2
+    for row, col in all_addresses:
+        val = await read_byte(dut, row, col)
+        assert val == constants.ALL_ZEROES
+        await write_byte(dut, row, col, constants.ALL_ONES)
+    
+    #Pass 3
+    for row, col in all_addrs:
+        val = await read_byte(dut, row, col)
+        assert val == constants.ALL_ONES, f"Pass 3 ↑ r1 failed at ({row},{col}): got {val:#04x}"
+        await write_byte(dut, row, col, constants.ALL_ZEROES)
+
+    # Pass 4: ↓ read 0x00, then write 0xFF
+    for row, col in reversed(all_addrs):
+        val = await read_byte(dut, row, col)
+        assert val == constants.ALL_ZEROES, f"Pass 4 ↓ r0 failed at ({row},{col}): got {val:#04x}"
+        await write_byte(dut, row, col, constants.ALL_ONES)
+
+    # Pass 5: ↓ read 0xFF, then write 0x00
+    for row, col in reversed(all_addrs):
+        val = await read_byte(dut, row, col)
+        assert val == constants.ALL_ONES, f"Pass 5 ↓ r1 failed at ({row},{col}): got {val:#04x}"
+        await write_byte(dut, row, col, constants.ALL_ZEROES)
+
+    # Pass 6: ↑ read 0x00 (final verification)
+    for row, col in all_addrs:
+        val = await read_byte(dut, row, col)
+        assert val == constants.ALL_ZEROES, f"Pass 6 ↑ r0 failed at ({row},{col}): got {val:#04x}"
+
